@@ -114,7 +114,7 @@ async function main() {
   {
     const r = await req("GET", "/profile/current", cookie);
     check("GET /profile/current → 200", r.status === 200, `status=${r.status}`);
-    check("  profile has role", r.data?.data?.role !== undefined);
+    check("  profile has role", r.data?.data?.profile?.role !== undefined);
   }
 
   // Studies list

@@ -41,10 +41,14 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient();
   const payload = parsed.data;
-  const protocolNumber = payload.protocol_number?.trim() || (await generateProtocolNumber(supabase));
 
-  const { data: study, error: studyError } = await supabase
-    .rpc("create_study_as_owner", {
+  // Retry up to 5 times in case of protocol_number collisions (can happen when RLS hides existing studies from generateProtocolNumber)
+  let study = null;
+  let studyError = null;
+  const baseProtocolNumber = payload.protocol_number?.trim() || null;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const protocolNumber = baseProtocolNumber ?? (await generateProtocolNumber(supabase));
+    const result = await supabase.rpc("create_study_as_owner", {
       p_protocol_number: protocolNumber,
       p_title: payload.title.trim(),
       p_phase: payload.phase,
@@ -57,6 +61,18 @@ export async function POST(request: NextRequest) {
       p_planned_end_date: payload.planned_end_date || null,
       p_actual_start_date: payload.actual_start_date || null,
     });
+    if (!result.error || baseProtocolNumber) {
+      study = result.data;
+      studyError = result.error;
+      break;
+    }
+    // Only retry on duplicate key errors
+    if (!result.error.message.includes("duplicate key")) {
+      studyError = result.error;
+      break;
+    }
+    studyError = result.error;
+  }
 
   if (studyError || !study) return sendError(studyError?.message ?? "Failed to create study", 500);
 

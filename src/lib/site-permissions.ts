@@ -6,7 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 type SiteMemberRow = Database["public"]["Tables"]["site_members"]["Row"];
 
 export function isGlobalStudyOperator(role: Role | string | null | undefined): boolean {
-  return role === "admin";
+  return role === "admin" || role === "study_manager";
 }
 
 export function hasPermission(mask: number, permissionBit: number): boolean {
