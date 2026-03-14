@@ -6,8 +6,6 @@ import { cn, getErrorMessage } from "@/lib/utils";
 import { useDashboardMetrics } from "@/hooks/use-dashboard-metrics";
 import { MetricCards } from "@/components/ctms/dashboard/metric-cards";
 import { EnrollmentTable } from "@/components/ctms/dashboard/enrollment-table";
-import { UpcomingVisitsList } from "@/components/ctms/dashboard/upcoming-visits-list";
-import { DeviationsSummary } from "@/components/ctms/dashboard/deviations-summary";
 import { RecentActivityFeed } from "@/components/ctms/dashboard/recent-activity-feed";
 
 export default function AdminWorkspacePage() {
@@ -19,7 +17,7 @@ export default function AdminWorkspacePage() {
         <div>
           <h1 className="text-2xl font-semibold">Admin Workspace</h1>
           <p className="text-muted-foreground">
-            Portfolio-wide view for operations, quality risks, and recent system activity.
+            Portfolio-wide view for operations and recent system activity.
           </p>
         </div>
         <Link href="/dashboard/studies/new" className={cn(buttonVariants({ variant: "default" }))}>
@@ -57,19 +55,9 @@ export default function AdminWorkspacePage() {
             activeStudies={data.activeStudies}
             totalSites={data.totalSites}
             totalEnrolled={data.totalEnrolled}
-            openDeviations={data.openDeviations}
           />
 
           <EnrollmentTable rows={data.enrollmentRows} />
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <UpcomingVisitsList visits={data.upcomingVisits} />
-            <DeviationsSummary
-              minor={data.deviationBreakdown.minor}
-              major={data.deviationBreakdown.major}
-              critical={data.deviationBreakdown.critical}
-            />
-          </div>
 
           <RecentActivityFeed items={data.recentActivity} />
         </>

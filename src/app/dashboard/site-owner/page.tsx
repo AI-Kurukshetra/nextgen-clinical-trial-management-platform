@@ -5,7 +5,6 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn, getErrorMessage } from "@/lib/utils";
 import { useDashboardMetrics } from "@/hooks/use-dashboard-metrics";
 import { MetricCards } from "@/components/ctms/dashboard/metric-cards";
-import { UpcomingVisitsList } from "@/components/ctms/dashboard/upcoming-visits-list";
 import { MyMilestoneTasksPanel } from "@/components/ctms/milestones/my-milestone-tasks-panel";
 
 export default function SiteOwnerWorkspacePage() {
@@ -26,8 +25,7 @@ export default function SiteOwnerWorkspacePage() {
       </div>
 
       <section className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
-        This dashboard is tenant-scoped by your site memberships only. You can manage subjects, assignments, visits,
-        and deviations for your permitted sites.
+        This dashboard is tenant-scoped by your site memberships only. You can manage subjects and assignments for your permitted sites.
       </section>
 
       {isLoading ? <p className="text-sm text-muted-foreground">Loading site metrics...</p> : null}
@@ -47,11 +45,6 @@ export default function SiteOwnerWorkspacePage() {
               Create Study
             </Link>
           </div>
-          <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
-            <li>1. Study owner creates/opens study.</li>
-            <li>2. Add site and assign site admin/owner.</li>
-            <li>3. Begin subject onboarding and form assignments.</li>
-          </ul>
         </section>
       ) : null}
 
@@ -62,9 +55,7 @@ export default function SiteOwnerWorkspacePage() {
             activeStudies={data.activeStudies}
             totalSites={data.totalSites}
             totalEnrolled={data.totalEnrolled}
-            openDeviations={data.openDeviations}
           />
-          <UpcomingVisitsList visits={data.upcomingVisits} />
         </>
       ) : null}
     </div>

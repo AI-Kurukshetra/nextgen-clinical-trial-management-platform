@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SIGNATURE_TABLES = ["documents", "deviations", "monitoring_visits"] as const;
+export const SIGNATURE_TABLES = ["documents"] as const;
 
 export const signatureCreateSchema = z.object({
   table_name: z.enum(SIGNATURE_TABLES),

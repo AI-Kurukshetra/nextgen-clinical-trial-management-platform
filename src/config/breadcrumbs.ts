@@ -47,10 +47,6 @@ const pathSegments: Record<string, BreadcrumbSegment[]> = {
     { label: "Studies", href: "/dashboard/studies" },
     { label: "Study Detail" },
   ],
-  "/dashboard/monitoring": [
-    { label: "Dashboard", href: "/dashboard" },
-    { label: "My CRA Visits" },
-  ],
   "/admin": [
     { label: "Dashboard", href: "/dashboard" },
     { label: "Admin" },
@@ -90,8 +86,6 @@ export function getBreadcrumbs(pathname: string): BreadcrumbSegment[] {
       edit: "Edit Study",
       sites: "Sites",
       subjects: "Subjects",
-      monitoring: "Monitoring (CRA)",
-      deviations: "Deviations",
       milestones: "Milestones",
       documents: "Documents",
       forms: "Forms",

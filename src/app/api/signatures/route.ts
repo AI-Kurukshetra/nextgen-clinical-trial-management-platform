@@ -41,39 +41,14 @@ export async function POST(request: NextRequest) {
 
   const supabase = await createClient();
 
-  let studyId = "";
-  let existingRecord: Record<string, unknown> | null = null;
+  const { data: document, error: docError } = await supabase
+    .from("documents")
+    .select("id, study_id, status")
+    .eq("id", payload.record_id)
+    .single();
+  if (docError || !document) return sendError("Document not found", 404);
 
-  if (payload.table_name === "documents") {
-    const { data, error } = await supabase
-      .from("documents")
-      .select("id, study_id, status")
-      .eq("id", payload.record_id)
-      .single();
-    if (error || !data) return sendError("Document not found", 404);
-    studyId = data.study_id;
-    existingRecord = data as unknown as Record<string, unknown>;
-  } else if (payload.table_name === "deviations") {
-    const { data, error } = await supabase
-      .from("deviations")
-      .select("id, study_id, status, resolved_date")
-      .eq("id", payload.record_id)
-      .single();
-    if (error || !data) return sendError("Deviation not found", 404);
-    studyId = data.study_id;
-    existingRecord = data as unknown as Record<string, unknown>;
-  } else {
-    const { data, error } = await supabase
-      .from("monitoring_visits")
-      .select("id, study_id, status")
-      .eq("id", payload.record_id)
-      .single();
-    if (error || !data) return sendError("Monitoring visit not found", 404);
-    studyId = data.study_id;
-    existingRecord = data as unknown as Record<string, unknown>;
-  }
-
-  const hasManageAccess = await canManageStudy(supabase, studyId, auth.user.id, auth.profile?.role);
+  const hasManageAccess = await canManageStudy(supabase, document.study_id, auth.user.id, auth.profile?.role);
   if (!hasManageAccess) return sendError("Forbidden", 403);
 
   const ipAddress = getRequestIp(request);
@@ -97,7 +72,7 @@ export async function POST(request: NextRequest) {
     return sendError(signatureError?.message ?? "Failed to create signature", 500);
   }
 
-  if (payload.table_name === "documents" && payload.meaning.toLowerCase() === "approved") {
+  if (payload.meaning.toLowerCase() === "approved") {
     const { data: updatedDocument, error: updateError } = await supabase
       .from("documents")
       .update({ status: "approved" })
@@ -109,44 +84,8 @@ export async function POST(request: NextRequest) {
       tableName: "documents",
       recordId: payload.record_id,
       action: "UPDATE",
-      oldData: existingRecord,
+      oldData: document as unknown as Record<string, unknown>,
       newData: updatedDocument as unknown as Record<string, unknown>,
-      performedBy: auth.user.id,
-    });
-  }
-
-  if (payload.table_name === "deviations" && payload.meaning.toLowerCase() === "closed") {
-    const { data: updatedDeviation, error: updateError } = await supabase
-      .from("deviations")
-      .update({ status: "closed", resolved_date: new Date().toISOString().slice(0, 10) })
-      .eq("id", payload.record_id)
-      .select("id, study_id, status, resolved_date")
-      .single();
-    if (updateError || !updatedDeviation) return sendError(updateError?.message ?? "Failed to close deviation", 500);
-    await insertAuditLog(supabase, {
-      tableName: "deviations",
-      recordId: payload.record_id,
-      action: "UPDATE",
-      oldData: existingRecord,
-      newData: updatedDeviation as unknown as Record<string, unknown>,
-      performedBy: auth.user.id,
-    });
-  }
-
-  if (payload.table_name === "monitoring_visits" && payload.meaning.toLowerCase() === "reviewed") {
-    const { data: updatedVisit, error: updateError } = await supabase
-      .from("monitoring_visits")
-      .update({ status: "completed" })
-      .eq("id", payload.record_id)
-      .select("id, study_id, status")
-      .single();
-    if (updateError || !updatedVisit) return sendError(updateError?.message ?? "Failed to update visit", 500);
-    await insertAuditLog(supabase, {
-      tableName: "monitoring_visits",
-      recordId: payload.record_id,
-      action: "UPDATE",
-      oldData: existingRecord,
-      newData: updatedVisit as unknown as Record<string, unknown>,
       performedBy: auth.user.id,
     });
   }

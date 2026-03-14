@@ -8,7 +8,7 @@ import { generateProtocolNumber } from "@/lib/identifiers";
 import { studyCreateSchema } from "@/types/schemas";
 import type { Study } from "@/types/database";
 
-const STUDY_COLUMNS = "id, protocol_number, title, phase, status, therapeutic_area, sponsor_name, indication, target_enrollment, planned_start_date, planned_end_date, actual_start_date, created_by, owner_user_id, created_at, updated_at";
+const STUDY_COLUMNS = "id, protocol_number, title, phase, status, therapeutic_area, sponsor_name, cro_partner, regulatory_reference, indication, target_enrollment, planned_start_date, planned_end_date, actual_start_date, created_by, owner_user_id, created_at, updated_at";
 
 export async function GET() {
   const auth = await requireAuth();
@@ -60,13 +60,29 @@ export async function POST(request: NextRequest) {
 
   if (studyError || !study) return sendError(studyError?.message ?? "Failed to create study", 500);
 
+  // Patch extra fields not supported by RPC (cro_partner, regulatory_reference)
+  const extraFields: Record<string, unknown> = {};
+  if (payload.cro_partner) extraFields.cro_partner = payload.cro_partner;
+  if (payload.regulatory_reference) extraFields.regulatory_reference = payload.regulatory_reference;
+
+  let finalStudy: Study = study as Study;
+  if (Object.keys(extraFields).length > 0) {
+    const { data: patched } = await supabase
+      .from("studies")
+      .update(extraFields)
+      .eq("id", study.id)
+      .select(STUDY_COLUMNS)
+      .single();
+    if (patched) finalStudy = patched as Study;
+  }
+
   await insertAuditLog(supabase, {
     tableName: "studies",
     recordId: study.id,
     action: "INSERT",
-    newData: study as unknown as Record<string, unknown>,
+    newData: finalStudy as unknown as Record<string, unknown>,
     performedBy: auth.user.id,
   });
 
-  return sendSuccess<Study>(study as Study, 201, { message: "Study created." });
+  return sendSuccess<Study>(finalStudy, 201, { message: "Study created." });
 }

@@ -21,6 +21,8 @@ export interface Study {
   planned_start_date: string | null;
   planned_end_date: string | null;
   actual_start_date: string | null;
+  cro_partner: string | null;
+  regulatory_reference: string | null;
   created_by: string | null;
   owner_user_id: string | null;
   created_at: string;
@@ -45,6 +47,12 @@ export interface Site {
   status: string;
   principal_investigator_name: string | null;
   principal_investigator_email: string | null;
+  principal_investigator_phone: string | null;
+  address: string | null;
+  state: string | null;
+  postal_code: string | null;
+  irb_number: string | null;
+  irb_approval_date: string | null;
   target_enrollment: number | null;
   enrolled_count: number;
   screen_failures: number;
@@ -65,6 +73,7 @@ export interface Subject {
   enrollment_date: string | null;
   completion_date: string | null;
   withdrawal_reason: string | null;
+  screen_failure_reason: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -219,7 +228,7 @@ export interface AuditLog {
 
 export interface Signature {
   id: string;
-  table_name: "documents" | "deviations" | "monitoring_visits";
+  table_name: "documents";
   record_id: string;
   signed_by: string;
   reason: string;

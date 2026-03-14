@@ -14,7 +14,7 @@ import { signatureCreateSchema, type SignatureCreateInput } from "@/types/schema
 
 interface SignDialogProps {
   triggerLabel: string;
-  tableName: "documents" | "deviations" | "monitoring_visits";
+  tableName: "documents";
   recordId: string;
   meaning: string;
   title: string;

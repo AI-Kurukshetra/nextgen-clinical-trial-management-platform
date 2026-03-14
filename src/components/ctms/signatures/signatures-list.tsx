@@ -5,7 +5,7 @@ import { useRecordSignatures } from "@/hooks/use-signatures";
 import { getErrorMessage } from "@/lib/utils";
 
 interface SignaturesListProps {
-  tableName: "documents" | "deviations" | "monitoring_visits";
+  tableName: "documents";
   recordId: string;
 }
 

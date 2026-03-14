@@ -4,19 +4,17 @@ interface MetricCardsProps {
   activeStudies: number;
   totalSites: number;
   totalEnrolled: number;
-  openDeviations: number;
 }
 
-export function MetricCards({ activeStudies, totalSites, totalEnrolled, openDeviations }: MetricCardsProps) {
+export function MetricCards({ activeStudies, totalSites, totalEnrolled }: MetricCardsProps) {
   const items = [
     { label: "Active Studies", value: activeStudies },
     { label: "Total Sites", value: totalSites },
     { label: "Total Enrolled", value: totalEnrolled },
-    { label: "Open Deviations", value: openDeviations },
   ];
 
   return (
-    <div className="grid gap-3 md:grid-cols-4">
+    <div className="grid gap-3 md:grid-cols-3">
       {items.map((item) => (
         <Card key={item.label}>
           <CardHeader>

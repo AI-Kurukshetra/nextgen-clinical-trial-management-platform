@@ -8,7 +8,7 @@ import { subjectCreateSchema } from "@/types/schemas";
 import type { Subject } from "@/types/database";
 
 const SUBJECT_COLUMNS =
-  "id, study_id, site_id, subject_number, initials, status, screen_date, enrollment_date, completion_date, withdrawal_reason, created_at, updated_at";
+  "id, study_id, site_id, subject_number, initials, status, screen_date, enrollment_date, completion_date, withdrawal_reason, screen_failure_reason, created_at, updated_at";
 
 export async function GET(request: NextRequest) {
   const auth = await requireAuth();
@@ -70,6 +70,7 @@ export async function POST(request: NextRequest) {
       enrollment_date: payload.enrollment_date || null,
       completion_date: payload.completion_date || null,
       withdrawal_reason: payload.withdrawal_reason || null,
+      screen_failure_reason: payload.screen_failure_reason || null,
     })
     .select(SUBJECT_COLUMNS)
     .single();

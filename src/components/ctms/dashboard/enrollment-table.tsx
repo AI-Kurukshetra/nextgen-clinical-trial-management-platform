@@ -7,7 +7,6 @@ interface EnrollmentRow {
   targetEnrollment: number;
   enrolledCount: number;
   siteCount: number;
-  openDeviationCount: number;
 }
 
 interface EnrollmentTableProps {
@@ -25,7 +24,6 @@ export function EnrollmentTable({ rows }: EnrollmentTableProps) {
             <TableHead>Title</TableHead>
             <TableHead>Sites</TableHead>
             <TableHead>Enrolled / Target</TableHead>
-            <TableHead>Open Deviations</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -37,7 +35,6 @@ export function EnrollmentTable({ rows }: EnrollmentTableProps) {
               <TableCell>
                 {row.enrolledCount}/{row.targetEnrollment || "-"}
               </TableCell>
-              <TableCell>{row.openDeviationCount}</TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -73,6 +73,14 @@ const workflowSteps = [
   },
 ];
 
+const phaseOneCompleted = [
+  "Study + protocol/design foundation with scoped ownership and role-aware access",
+  "Sites, subjects, monitoring, deviations, and milestone workflows",
+  "Document metadata with S3/MinIO upload pipeline and download controls",
+  "Electronic signatures, audit logs, and permission-driven operational actions",
+  "Patient form templates, assignment workflows, and secure portal submissions",
+];
+
 const mediaHighlights = [
   { title: "Study Command Center", image: "/home/analytics.jpg" },
   { title: "Site Oversight", image: "/home/site-operations.jpg" },
@@ -118,13 +126,21 @@ export default async function HomePage() {
 
               <div className="flex flex-wrap items-center gap-3">
                 {user ? (
-                  <Button
-                    size="lg"
-                    render={<Link href="/dashboard">Open Dashboard</Link>}
-                    nativeButton={false}
-                    icon={<ArrowRight />}
-                    iconPosition="end"
-                  />
+                  <>
+                    <Button
+                      size="lg"
+                      render={<Link href="/dashboard">Open Dashboard</Link>}
+                      nativeButton={false}
+                      icon={<ArrowRight />}
+                      iconPosition="end"
+                    />
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      render={<Link href="/understanding">How It Works</Link>}
+                      nativeButton={false}
+                    />
+                  </>
                 ) : (
                   <>
                     <Button
@@ -138,6 +154,12 @@ export default async function HomePage() {
                       size="lg"
                       variant="outline"
                       render={<Link href="/auth/sign-in">Sign In</Link>}
+                      nativeButton={false}
+                    />
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      render={<Link href="/understanding">How It Works</Link>}
                       nativeButton={false}
                     />
                   </>
@@ -251,6 +273,39 @@ export default async function HomePage() {
                 ))}
               </div>
             </div>
+          </section>
+
+          <section className="mt-12 md:mt-16">
+            <Card className="border-border/80 bg-card/70">
+              <CardHeader className="space-y-3">
+                <Badge variant="outline" className="w-fit">
+                  Product Understanding
+                </Badge>
+                <CardTitle className="font-display text-2xl md:text-3xl">
+                  Phase 1 is complete and operationally usable end-to-end.
+                </CardTitle>
+                <CardDescription className="max-w-3xl">
+                  TrialFlow now supports the core clinical execution lifecycle across study setup, site operations,
+                  subject management, compliance workflows, and milestone governance.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-end">
+                <div className="grid gap-2 md:grid-cols-2">
+                  {phaseOneCompleted.map((item) => (
+                    <p key={item} className="text-sm text-muted-foreground">
+                      - {item}
+                    </p>
+                  ))}
+                </div>
+                <Button
+                  size="lg"
+                  render={<Link href="/understanding">Open Full Understanding Page</Link>}
+                  nativeButton={false}
+                  icon={<ArrowRight />}
+                  iconPosition="end"
+                />
+              </CardContent>
+            </Card>
           </section>
 
           <section className="mt-12 rounded-2xl border border-border/80 bg-card/80 p-6 md:mt-16 md:p-8">

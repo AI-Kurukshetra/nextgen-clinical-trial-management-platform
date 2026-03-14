@@ -15,15 +15,6 @@ export const QUERY_KEYS = {
     assignments: (studyId: string, siteId?: string) =>
       ["subjects", "assignments", "study", studyId, "site", siteId ?? "all"] as const,
   },
-  monitoringVisits: {
-    byStudy: (studyId: string) => ["monitoring-visits", "study", studyId] as const,
-    mine: ["monitoring-visits", "mine"] as const,
-    detail: (id: string) => ["monitoring-visits", "detail", id] as const,
-  },
-  deviations: {
-    byStudy: (studyId: string) => ["deviations", "study", studyId] as const,
-    detail: (id: string) => ["deviations", "detail", id] as const,
-  },
   milestones: {
     byStudy: (studyId: string) => ["milestones", "study", studyId] as const,
     detail: (id: string) => ["milestones", "detail", id] as const,
@@ -35,7 +26,7 @@ export const QUERY_KEYS = {
     detail: (id: string) => ["documents", "detail", id] as const,
   },
   signatures: {
-    byRecord: (tableName: "documents" | "deviations" | "monitoring_visits", recordId: string) =>
+    byRecord: (tableName: "documents", recordId: string) =>
       ["signatures", "table", tableName, "record", recordId] as const,
   },
   profile: {

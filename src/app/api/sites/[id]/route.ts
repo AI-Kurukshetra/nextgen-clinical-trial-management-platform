@@ -10,7 +10,7 @@ import type { Site } from "@/types/database";
 type RouteContext = { params: Promise<{ id: string }> };
 
 const SITE_COLUMNS =
-  "id, study_id, site_number, name, city, country, status, principal_investigator_name, principal_investigator_email, target_enrollment, enrolled_count, screen_failures, initiated_date, closed_date, created_at, updated_at";
+  "id, study_id, site_number, name, address, city, state, postal_code, country, status, principal_investigator_name, principal_investigator_email, principal_investigator_phone, irb_number, irb_approval_date, target_enrollment, enrolled_count, screen_failures, initiated_date, closed_date, created_at, updated_at";
 
 export async function GET(_request: NextRequest, context: RouteContext) {
   const auth = await requireAuth();
@@ -56,11 +56,17 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     .update({
       site_number: nextSiteNumber,
       name: payload.name?.trim(),
+      address: payload.address ?? null,
       city: payload.city ?? null,
+      state: payload.state ?? null,
+      postal_code: payload.postal_code ?? null,
       country: payload.country,
       status: payload.status,
       principal_investigator_name: payload.principal_investigator_name ?? null,
       principal_investigator_email: payload.principal_investigator_email ?? null,
+      principal_investigator_phone: payload.principal_investigator_phone ?? null,
+      irb_number: payload.irb_number ?? null,
+      irb_approval_date: payload.irb_approval_date ?? null,
       target_enrollment: payload.target_enrollment ?? null,
       initiated_date: payload.initiated_date ?? null,
       closed_date: payload.closed_date ?? null,

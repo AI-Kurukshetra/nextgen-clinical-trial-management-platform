@@ -10,7 +10,6 @@ export const ROUTES = {
   DASHBOARD_FIELD: "/dashboard/field",
   DASHBOARD_MONITOR: "/dashboard/monitor",
   STUDIES: "/dashboard/studies",
-  MONITORING: "/dashboard/monitoring",
   ADMIN: "/admin",
   PROFILE: "/profile",
   PORTAL: "/portal",

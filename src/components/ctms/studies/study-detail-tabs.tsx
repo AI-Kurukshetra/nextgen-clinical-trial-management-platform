@@ -12,8 +12,6 @@ const tabs = [
   { label: "Overview", path: "" },
   { label: "Sites", path: "sites" },
   { label: "Subjects", path: "subjects" },
-  { label: "Monitoring (CRA)", path: "monitoring" },
-  { label: "Deviations", path: "deviations" },
   { label: "Milestones", path: "milestones" },
   { label: "Documents", path: "documents" },
   { label: "Forms", path: "forms" },

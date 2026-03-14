@@ -3,7 +3,6 @@ import { ROUTES } from "@/constants/routes";
 import {
   LayoutDashboard,
   ClipboardList,
-  Stethoscope,
   Shield,
   User,
 } from "lucide-react";
@@ -32,12 +31,6 @@ export const sidebarNav: NavItem[] = [
     href: ROUTES.STUDIES,
     icon: ClipboardList,
     roles: ["admin", "study_manager", "monitor", "site_coordinator", "viewer"],
-  },
-  {
-    label: "My CRA Visits",
-    href: ROUTES.MONITORING,
-    icon: Stethoscope,
-    roles: ["admin", "study_manager", "monitor"],
   },
   {
     label: "Admin",

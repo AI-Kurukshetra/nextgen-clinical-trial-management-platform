@@ -9,7 +9,7 @@ import type { Study } from "@/types/database";
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-const STUDY_COLUMNS = "id, protocol_number, title, phase, status, therapeutic_area, sponsor_name, indication, target_enrollment, planned_start_date, planned_end_date, actual_start_date, created_by, owner_user_id, created_at, updated_at";
+const STUDY_COLUMNS = "id, protocol_number, title, phase, status, therapeutic_area, sponsor_name, cro_partner, regulatory_reference, indication, target_enrollment, planned_start_date, planned_end_date, actual_start_date, created_by, owner_user_id, created_at, updated_at";
 
 export async function GET(_request: NextRequest, context: RouteContext) {
   const auth = await requireAuth();
@@ -65,6 +65,8 @@ export async function PUT(request: NextRequest, context: RouteContext) {
       status: payload.status,
       therapeutic_area: payload.therapeutic_area ?? null,
       sponsor_name: payload.sponsor_name ?? null,
+      cro_partner: payload.cro_partner ?? null,
+      regulatory_reference: payload.regulatory_reference ?? null,
       indication: payload.indication ?? null,
       target_enrollment: payload.target_enrollment ?? null,
       planned_start_date: payload.planned_start_date ?? null,
