@@ -52,43 +52,45 @@ export function DataGridToolbar<TData>({
       .filter((col) => col.getCanHide() && col.id !== "select").length > 0;
 
   return (
-    <div className="flex flex-wrap items-center gap-4 py-4">
+    <div className="flex flex-col gap-3 py-4 sm:flex-row sm:flex-wrap sm:items-center">
       {showGlobalSearch && (
         <Input
           placeholder={searchPlaceholder}
           value={globalFilter}
           onChange={(e) => onGlobalFilterChange(e.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm"
         />
       )}
-      {canHideColumns && (
-        <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button variant="outline" size="sm">
-              <Columns className="mr-2 h-4 w-4" />
-              Columns
-              <ChevronDown className="ml-2 h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {table
-              .getAllColumns()
-              .filter((col) => col.getCanHide() && col.id !== "select")
-              .map((col) => (
-                <DropdownMenuCheckboxItem
-                  key={col.id}
-                  checked={col.getIsVisible()}
-                  onCheckedChange={(value) => col.toggleVisibility(!!value)}
-                >
-                  {typeof col.columnDef.header === "string"
-                    ? col.columnDef.header
-                    : col.id}
-                </DropdownMenuCheckboxItem>
-              ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
-      {children}
+      <div className="flex flex-wrap items-center gap-2">
+        {canHideColumns && (
+          <DropdownMenu>
+            <DropdownMenuTrigger>
+              <Button variant="outline" size="sm">
+                <Columns className="mr-2 h-4 w-4" />
+                Columns
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {table
+                .getAllColumns()
+                .filter((col) => col.getCanHide() && col.id !== "select")
+                .map((col) => (
+                  <DropdownMenuCheckboxItem
+                    key={col.id}
+                    checked={col.getIsVisible()}
+                    onCheckedChange={(value) => col.toggleVisibility(!!value)}
+                  >
+                    {typeof col.columnDef.header === "string"
+                      ? col.columnDef.header
+                      : col.id}
+                  </DropdownMenuCheckboxItem>
+                ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        {children}
+      </div>
     </div>
   );
 }

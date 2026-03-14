@@ -11,14 +11,24 @@ type HomeNavProps = {
 
 export function HomeNav({ user }: HomeNavProps) {
   return (
-    <nav className="flex items-center gap-2">
-      <Button variant="ghost" render={<Link href="/understanding">Understanding</Link>} nativeButton={false} />
+    <nav className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
+      <Button
+        variant="ghost"
+        className="hidden md:inline-flex"
+        render={<Link href="/understanding">Understanding</Link>}
+        nativeButton={false}
+      />
       <ThemeSwitcher />
       {user ? (
         <Button variant="default" render={<Link href="/dashboard">Dashboard</Link>} nativeButton={false} />
       ) : (
         <>
-          <Button variant="ghost" render={<Link href="/auth/sign-in">Sign in</Link>} nativeButton={false} />
+          <Button
+            variant="ghost"
+            className="hidden sm:inline-flex"
+            render={<Link href="/auth/sign-in">Sign in</Link>}
+            nativeButton={false}
+          />
           <Button variant="default" render={<Link href="/auth/sign-up">Sign up</Link>} nativeButton={false} />
         </>
       )}

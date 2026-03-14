@@ -141,7 +141,10 @@ export function SubjectAssignmentsPanel({ studyId, subjects }: SubjectAssignment
 
       <div className="space-y-2">
         {(assignments ?? []).map((assignment) => (
-          <div key={assignment.id} className="flex items-center justify-between rounded-md border p-2 text-sm">
+          <div
+            key={assignment.id}
+            className="flex flex-col gap-2 rounded-md border p-2 text-sm sm:flex-row sm:items-center sm:justify-between"
+          >
             <div>
               <p className="font-medium">
                 Subject: {assignment.subject?.subject_number ?? assignment.subject_id}

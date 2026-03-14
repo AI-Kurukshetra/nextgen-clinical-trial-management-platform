@@ -16,18 +16,27 @@ type AppSidebarProps = {
   userRole: Role;
   collapsed: boolean;
   onToggle: () => void;
+  mobile?: boolean;
+  onNavigate?: () => void;
 };
 
-export function AppSidebar({ userRole, collapsed, onToggle }: AppSidebarProps) {
+export function AppSidebar({
+  userRole,
+  collapsed,
+  onToggle,
+  mobile = false,
+  onNavigate,
+}: AppSidebarProps) {
   const pathname = usePathname();
   const mainItems = getVisibleNavItems(sidebarNav, userRole);
   const footerItems = getVisibleNavItems(sidebarNavFooter, userRole);
+  const isCollapsed = mobile ? false : collapsed;
 
   return (
     <aside
       className={cn(
         "flex h-full shrink-0 flex-col border-r border-border bg-sidebar transition-[width] duration-200 ease-in-out",
-        collapsed ? "w-[3.25rem]" : "w-56"
+        mobile ? "w-full max-w-xs" : collapsed ? "w-[3.25rem]" : "w-56"
       )}
     >
       <div className="flex flex-1 flex-col gap-1 overflow-hidden p-2">
@@ -40,17 +49,18 @@ export function AppSidebar({ userRole, collapsed, onToggle }: AppSidebarProps) {
             <Link
               key={item.href + item.label}
               href={item.href}
-              title={collapsed ? item.label : undefined}
+              title={isCollapsed ? item.label : undefined}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                collapsed && "justify-center px-2",
+                isCollapsed && "justify-center px-2",
                 isActive
                   ? "bg-sidebar-accent text-sidebar-accent-foreground"
                   : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
               )}
             >
               {Icon && <Icon className="h-4 w-4 shrink-0" />}
-              {!collapsed && <span className="truncate">{item.label}</span>}
+              {!isCollapsed && <span className="truncate">{item.label}</span>}
             </Link>
           );
         })}
@@ -64,40 +74,43 @@ export function AppSidebar({ userRole, collapsed, onToggle }: AppSidebarProps) {
               <Link
                 key={item.href + item.label}
                 href={item.href}
-                title={collapsed ? item.label : undefined}
+                title={isCollapsed ? item.label : undefined}
+                onClick={onNavigate}
                 className={cn(
                   "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                  collapsed && "justify-center px-2",
+                  isCollapsed && "justify-center px-2",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "text-sidebar-foreground hover:bg-sidebar-accent/50"
                 )}
               >
                 {Icon && <Icon className="h-4 w-4 shrink-0" />}
-                {!collapsed && <span className="truncate">{item.label}</span>}
+                {!isCollapsed && <span className="truncate">{item.label}</span>}
               </Link>
             );
           })}
         </div>
       )}
-      <div className="border-t border-sidebar-border p-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onToggle}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className={cn(
-            "h-9 w-9 shrink-0 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
-            collapsed && "w-full"
-          )}
-        >
-          {collapsed ? (
-            <PanelLeft className="h-4 w-4" />
-          ) : (
-            <PanelLeftClose className="h-4 w-4" />
-          )}
-        </Button>
-      </div>
+      {!mobile ? (
+        <div className="border-t border-sidebar-border p-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={cn(
+              "h-9 w-9 shrink-0 text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+              collapsed && "w-full"
+            )}
+          >
+            {collapsed ? (
+              <PanelLeft className="h-4 w-4" />
+            ) : (
+              <PanelLeftClose className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+      ) : null}
     </aside>
   );
 }

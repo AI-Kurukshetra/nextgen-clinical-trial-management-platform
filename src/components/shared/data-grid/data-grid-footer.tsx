@@ -56,12 +56,12 @@ export function DataGridFooter<TData>({
           colSpan={columnCount}
           className="h-12 px-4 text-muted-foreground"
         >
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-4">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
               <span className="text-sm">{summaryText}</span>
               {footerExtra}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 self-start sm:self-auto">
               <Button
                 variant="outline"
                 size="sm"

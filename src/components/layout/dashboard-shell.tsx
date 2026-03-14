@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 import { ContentContainer } from "@/components/shared/content-container";
@@ -15,10 +16,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { ROUTES } from "@/constants/routes";
 import type { Role } from "@/constants/roles";
+import { PanelLeft } from "lucide-react";
 
 type DashboardShellProps = {
   user: User;
@@ -31,14 +34,29 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
   const role = (profile?.role ?? "viewer") as Role;
   const { collapsed, toggle } = useSidebar();
   const { signOut } = useAuth();
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen min-h-0 w-full overflow-hidden">
-      <AppSidebar userRole={role} collapsed={collapsed} onToggle={toggle} />
+    <div className="flex h-dvh min-h-0 w-full overflow-hidden md:h-screen">
+      <div className="hidden md:block">
+        <AppSidebar userRole={role} collapsed={collapsed} onToggle={toggle} />
+      </div>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-14 shrink-0 items-center justify-between gap-4 border-b border-border bg-background px-4">
           <div className="flex min-w-0 items-center gap-2">
-            <LayoutBreadcrumbs />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              aria-label="Open navigation menu"
+              onClick={() => setMobileSidebarOpen(true)}
+            >
+              <PanelLeft className="h-4 w-4" />
+            </Button>
+            <div className="hidden min-w-0 md:block">
+              <LayoutBreadcrumbs />
+            </div>
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <ThemeSwitcher />
@@ -78,6 +96,21 @@ export function DashboardShell({ user, profile, children }: DashboardShellProps)
           <ContentContainer>{children}</ContentContainer>
         </main>
       </div>
+
+      <Sheet open={mobileSidebarOpen} onOpenChange={setMobileSidebarOpen}>
+        <SheetContent side="left" className="w-80 p-0">
+          <SheetHeader className="border-b border-sidebar-border px-4 py-3">
+            <SheetTitle>Navigation</SheetTitle>
+          </SheetHeader>
+          <AppSidebar
+            userRole={role}
+            collapsed={false}
+            onToggle={toggle}
+            mobile
+            onNavigate={() => setMobileSidebarOpen(false)}
+          />
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
