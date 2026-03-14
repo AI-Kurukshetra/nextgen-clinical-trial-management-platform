@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getBrowserSupabaseClient } from "@/lib/supabase";
 import { ROUTES } from "@/constants/routes";
+import { queryClient } from "@/lib/query-client";
 
 export function useAuth() {
   const router = useRouter();
@@ -15,6 +16,7 @@ export function useAuth() {
       if (error) {
         throw new Error(error.message);
       }
+      queryClient.clear();
       router.push(ROUTES.DASHBOARD);
     },
     [router, supabase]
@@ -52,15 +54,17 @@ export function useAuth() {
           "If this email is already registered, please sign in to your account."
         );
       }
+
+      queryClient.clear();
     },
     [supabase]
   );
 
   const signOut = useCallback(async (): Promise<void> => {
     await supabase.auth.signOut();
+    queryClient.clear();
     router.push(ROUTES.HOME);
   }, [router, supabase]);
 
   return { signIn, signUp, signOut };
 }
-

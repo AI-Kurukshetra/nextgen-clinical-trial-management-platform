@@ -1,87 +1,114 @@
 # Database
 
-## Stack
+## Source Of Truth
 
-- **Postgres** hosted on Supabase
-- **Migrations** managed via versioned SQL files in `supabase/migrations/`
-- **Row Level Security (RLS)** enabled on every table
-- **TypeScript types** in `src/types/database.ts` (manual; can be regenerated from Supabase CLI if desired)
+- Migrations live in `supabase/migrations/`
+- Current baseline migration: `20260314000001_ctms_schema.sql`
+- Protocol extension migration (Sprint 1): `20260314000006_protocol_entities.sql`
+- Site permissions + assignments migration: `20260314000007_site_permissions_and_assignments.sql`
+- RLS restoration + scope policies migration: `20260314000008_restore_rls_with_scope_policies.sql`
+- Electronic signatures migration: `20260315000001_signatures.sql`
+- SaaS ownership + subject forms migration: `20260315000002_saas_ownership_and_subject_forms.sql`
+- Milestone task board migration: `20260315000009_milestone_task_board.sql`
+- Multi-tenant RLS cleanup migration: `20260315000010_fix_site_insert_and_multitenant_policy_cleanup.sql`
+- Sites INSERT RETURNING RLS fix: `20260315000011_fix_sites_select_policy_for_insert_returning.sql`
+- Supabase Auth schema (`auth.*`) is preserved; this project only mutates `public.*`
 
----
+## Current Public Tables
 
-## Migration Conventions
+- `profiles`
+- `studies`
+- `study_team`
+- `protocol_objectives`
+- `eligibility_criteria`
+- `study_arms`
+- `visit_definitions`
+- `protocol_endpoints`
+- `protocol_amendments`
+- `sites`
+- `subjects`
+- `monitoring_visits`
+- `deviations`
+- `milestones`
+- `documents`
+- `audit_logs`
+- `signatures`
+- `site_members`
+- `subject_assignments`
+- `subject_form_templates`
+- `subject_form_assignments`
+- `subject_form_submissions`
+- `subject_portal_links`
 
-### File Naming
+## Auth And Trigger Notes
 
+- `public.handle_new_user()` is preserved and sets new profiles to role `viewer`.
+- Trigger `on_auth_user_created` remains attached to `auth.users`.
+- `public.set_updated_at()` is used by all mutable CTMS tables plus `profiles`.
+- `public.sync_site_enrollment()` updates site enrollment counters when subject status changes.
+- `studies` includes two protocol narrative fields: `safety_rules`, `statistical_plan`.
+- `studies.owner_user_id` is the tenant owner for the study.
+- Site-level delegation model:
+  - `site_members` stores owner/admin/viewer and permission bitmask per site.
+  - `subject_assignments` maps operational owners (nurse/doctor/etc.) per subject.
+- Milestone task board model:
+  - `milestones` now supports task details + assignment:
+    - `description`
+    - `site_id` (clinic assignment)
+    - `assignee_user_id` (direct user assignment)
+    - `created_by`
+    - `board_order` (kanban column ordering)
+  - `public.can_complete_milestone(uuid)` enables assignee/site-member completion checks.
+  - Trigger `enforce_milestone_update_scope_trigger` restricts non-manager updates to completion fields.
+- Signature model:
+  - `signatures` stores basic credential re-confirmed approvals/closures for documents, deviations, and monitoring records.
+- Subject form model:
+  - `subject_form_templates` stores no-code JSON schema templates.
+  - `subject_form_assignments` schedules templates for subjects.
+  - `subject_form_submissions` stores patient/staff responses.
+  - `subject_portal_links` maps patient auth users to subject records.
+- Study creation RPC:
+  - `public.create_study_as_owner(...)` inserts study + owner team row + default milestones in one transaction.
+  - Used by API to avoid intermittent RLS insert failures.
+
+## RLS
+
+RLS is enabled across CTMS tables using scoped policies from migration `20260314000008_restore_rls_with_scope_policies.sql`.
+
+Policy model:
+
+- SaaS isolation mode:
+  - `admin` is the only global role.
+- Study ownership is enforced by `studies.owner_user_id` (with optional `study_team` owner/manager rows for collaboration).
+- Site admin/staff can only operate on site-scoped entities through membership + bitmask permissions.
+- Site creation uses insert policy `WITH CHECK can_manage_study(study_id)` to avoid new-row `id` lookup failures.
+- Site read policy is study-scoped (`can_access_study(study_id)`) so API `insert(...).select(...)` works under RLS.
+- Study-scoped access uses `study_team` and inherited study access via `site_members`.
+- Site-scoped access uses `site_members` role + permission bitmask.
+- Subject and assignment actions enforce site-level permission checks.
+- Milestone writes are split by operation:
+  - Insert/Delete: study managers (owner/admin scope) only.
+  - Update: study managers plus assigned user/site member completion workflow.
+
+## Migration Workflow
+
+```bash
+npx supabase link --project-ref btyegkygtvotuaxjjzgl
+npx supabase db push
 ```
-supabase/migrations/
-  20250308000001_init_schema.sql
-```
 
-Format: `YYYYMMDDHHMMSS_<description>.sql`
-
-### Table Conventions
-
-| Column       | Type         | Notes                    |
-| ------------ | ------------ | ------------------------ |
-| `id`         | `uuid`       | Default `gen_random_uuid()` where applicable |
-| `created_by` | `uuid`       | FK to `auth.users(id)` for user-owned content |
-| `created_at` | `timestamptz` | Default `now()`        |
-| `updated_at` | `timestamptz` | Managed by trigger     |
-
-- All tables live in the `public` schema.
-- Enum-like columns use `text` with a `check` constraint.
-
----
-
-## Current Schema
-
-### `profiles`
-
-Stores app-level user data including role for RBAC. Row is created on sign-up via `handle_new_user` trigger.
-
-| Column      | Type         | Notes                          |
-| ----------- | ------------ | ------------------------------ |
-| id          | uuid         | PK, FK to auth.users(id)       |
-| email       | text         |                                |
-| full_name   | text         |                                |
-| avatar_url  | text         |                                |
-| role        | text         | admin / user; default 'user'   |
-| created_at  | timestamptz  |                                |
-| updated_at  | timestamptz  |                                |
-
-### `items`
-
-Demo entity for dashboard content. Users can CRUD own items; admins can CRUD any.
-
-| Column      | Type         | Notes                    |
-| ----------- | ------------ | ------------------------ |
-| id          | uuid         | PK                       |
-| title       | text         | not null                 |
-| description | text         |                          |
-| created_by  | uuid         | FK auth.users            |
-| created_at  | timestamptz  |                          |
-| updated_at  | timestamptz  |                          |
-
----
-
-## Row Level Security
-
-- **profiles:** Authenticated users can select all (for display); insert/update only own row.
-- **items:** Authenticated users can select all; insert with `created_by = auth.uid()`; update/delete own or (for admins) any. See migration file for full policies.
-
----
-
-## Useful Queries
+## Verification Queries
 
 ```sql
--- All tables with RLS status
+-- Confirm RLS is enabled across public tables
 select tablename, rowsecurity
 from pg_tables
-where schemaname = 'public';
+where schemaname = 'public'
+order by tablename;
 
--- All policies
-select tablename, policyname, cmd, qual
+-- Confirm policies
+select tablename, policyname, cmd
 from pg_policies
-where schemaname = 'public';
+where schemaname = 'public'
+order by tablename, policyname;
 ```

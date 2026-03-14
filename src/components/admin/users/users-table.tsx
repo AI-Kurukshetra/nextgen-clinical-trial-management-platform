@@ -30,7 +30,7 @@ export function UsersTable({ users }: UsersTableProps) {
               <TableCell>
                 <RoleSelect
                   userId={user.id}
-                  currentRole={(user.role as Role) ?? ROLES.USER}
+                  currentRole={(user.role as Role) ?? ROLES.VIEWER}
                 />
               </TableCell>
               <TableCell>
@@ -43,4 +43,3 @@ export function UsersTable({ users }: UsersTableProps) {
     </div>
   );
 }
-

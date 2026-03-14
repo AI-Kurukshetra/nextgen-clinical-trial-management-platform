@@ -31,7 +31,7 @@ export async function requireAuth() {
 export async function requireRole(allowedRoles: Role[]) {
   const data = await requireAuth();
   if (!data) return null;
-  const role = (data.profile?.role ?? "user") as Role;
+  const role = (data.profile?.role ?? "viewer") as Role;
   if (!allowedRoles.includes(role)) return null;
   return data;
 }

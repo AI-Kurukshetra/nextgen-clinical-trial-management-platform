@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "@/types/database";
 import { ROUTES } from "@/constants/routes";
+import type { Role } from "@/constants/roles";
 
 type DashboardShellProps = {
   user: User;
@@ -27,7 +28,7 @@ type DashboardShellProps = {
 
 export function DashboardShell({ user, profile, children }: DashboardShellProps) {
   const initial = (profile?.full_name || user.email || "U").slice(0, 1).toUpperCase();
-  const role = (profile?.role ?? "user") as "admin" | "user";
+  const role = (profile?.role ?? "viewer") as Role;
   const { collapsed, toggle } = useSidebar();
   const { signOut } = useAuth();
 

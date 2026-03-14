@@ -53,11 +53,19 @@ export function RoleSelect({ userId, currentRole }: RoleSelectProps) {
         <DropdownMenuItem onClick={() => void handleChange(ROLES.ADMIN)}>
           Admin
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => void handleChange(ROLES.USER)}>
-          User
+        <DropdownMenuItem onClick={() => void handleChange(ROLES.STUDY_MANAGER)}>
+          Study Manager
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => void handleChange(ROLES.MONITOR)}>
+          Monitor
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => void handleChange(ROLES.SITE_COORDINATOR)}>
+          Site Coordinator
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => void handleChange(ROLES.VIEWER)}>
+          Viewer
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
-

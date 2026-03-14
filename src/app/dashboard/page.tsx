@@ -1,34 +1,58 @@
-"use client";
+import { redirect } from "next/navigation";
+import { requireAuth } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
-import { useItems } from "@/hooks/use-items";
-import { ItemsList } from "@/components/dashboard/items-list";
-import { ItemsListSkeleton } from "@/components/dashboard/items-list-skeleton";
-import { SeedButton } from "@/components/dashboard/seed-button";
-import { getErrorMessage } from "@/lib/utils";
+export default async function DashboardPage() {
+  const auth = await requireAuth();
+  if (!auth) {
+    redirect("/auth/sign-in");
+  }
 
-export default function DashboardPage() {
-  const { data: items, isLoading, isError, error } = useItems();
+  const role = auth.profile?.role ?? "viewer";
+  const supabase = await createClient();
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">Dashboard</h1>
-          <p className="text-muted-foreground">
-            View and manage your items. Users can add and edit their own; admins can manage all.
-          </p>
-        </div>
-        <SeedButton />
-      </div>
-      {isLoading && <ItemsListSkeleton />}
-      {isError && (
-        <p className="text-sm text-destructive">
-          {getErrorMessage(error, "Failed to load items.")}
-        </p>
-      )}
-      {items && !isLoading && !isError && (
-        <ItemsList items={items} showActions="own" />
-      )}
-    </div>
-  );
+  const { data: siteMembership } = await supabase
+    .from("site_members")
+    .select("id")
+    .eq("user_id", auth.user.id)
+    .limit(1)
+    .maybeSingle();
+
+  const hasSiteMembership = Boolean(siteMembership?.id);
+  const { data: ownedStudy } = await supabase
+    .from("studies")
+    .select("id")
+    .eq("owner_user_id", auth.user.id)
+    .limit(1)
+    .maybeSingle();
+  const hasOwnedStudies = Boolean(ownedStudy?.id);
+  const { data: portalLink } = await supabase
+    .from("subject_portal_links")
+    .select("id")
+    .eq("user_id", auth.user.id)
+    .eq("status", "active")
+    .limit(1)
+    .maybeSingle();
+  const hasPortalAccess = Boolean(portalLink?.id);
+
+  if (role === "admin") {
+    redirect("/dashboard/admin");
+  }
+  if (role === "study_manager") {
+    redirect("/dashboard/study-manager");
+  }
+  if (role === "monitor") {
+    redirect("/dashboard/monitor");
+  }
+  if (hasOwnedStudies) {
+    redirect("/dashboard/study-manager");
+  }
+  if (role === "site_coordinator" || role === "viewer") {
+    if (hasPortalAccess && !hasSiteMembership) {
+      redirect("/portal");
+    }
+    redirect(hasSiteMembership ? "/dashboard/site-owner" : "/dashboard/field");
+  }
+
+  redirect("/dashboard/field");
 }

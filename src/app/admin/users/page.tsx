@@ -2,7 +2,6 @@
 
 import { useUsers } from "@/hooks/use-users";
 import { UsersTable } from "@/components/admin/users/users-table";
-import { ItemsTableSkeleton } from "@/components/dashboard/items-table-skeleton";
 import { EmptyState } from "@/components/common/empty-state";
 import { Users as UsersIcon } from "lucide-react";
 import { getErrorMessage } from "@/lib/utils";
@@ -12,7 +11,7 @@ export default function AdminUsersPage() {
   const users = data?.data ?? [];
 
   if (isLoading) {
-    return <ItemsTableSkeleton />;
+    return <p className="text-sm text-muted-foreground">Loading users...</p>;
   }
 
   if (isError) {
@@ -45,4 +44,3 @@ export default function AdminUsersPage() {
     </div>
   );
 }
-

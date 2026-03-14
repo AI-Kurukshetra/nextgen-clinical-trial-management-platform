@@ -1,30 +1,27 @@
 "use client";
 
-import { useItems } from "@/hooks/use-items";
-import { ItemsTable } from "@/components/dashboard/items-table";
-import { ItemsTableSkeleton } from "@/components/dashboard/items-table-skeleton";
+import { useStudies } from "@/hooks/use-studies";
+import { StudiesTable } from "@/components/ctms/studies/studies-table";
 import { getErrorMessage } from "@/lib/utils";
 
 export default function DashboardTablePage() {
-  const { data: items, isLoading, isError, error } = useItems();
+  const { data: studies, isLoading, isError, error } = useStudies();
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold">Table</h1>
+        <h1 className="text-2xl font-semibold">Studies Table</h1>
         <p className="text-muted-foreground">
-          Demo data table with sorting and pagination.
+          Unified tabular view of all accessible studies.
         </p>
       </div>
-      {isLoading && <ItemsTableSkeleton />}
+      {isLoading && <p className="text-sm text-muted-foreground">Loading studies...</p>}
       {isError && (
         <p className="text-sm text-destructive">
-          {getErrorMessage(error, "Failed to load items.")}
+          {getErrorMessage(error, "Failed to load studies.")}
         </p>
       )}
-      {items && !isLoading && !isError && (
-        <ItemsTable items={items} pageSize={10} />
-      )}
+      {studies && !isLoading && !isError && <StudiesTable studies={studies} />}
     </div>
   );
 }

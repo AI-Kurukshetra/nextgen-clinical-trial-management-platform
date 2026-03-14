@@ -2,9 +2,9 @@ import type { Role } from "@/constants/roles";
 import { ROUTES } from "@/constants/routes";
 import {
   LayoutDashboard,
+  ClipboardList,
+  Stethoscope,
   Shield,
-  Home,
-  Table2,
   User,
 } from "lucide-react";
 
@@ -18,26 +18,26 @@ export interface NavItem {
 
 /**
  * Sidebar navigation config. Items are shown when user's role is in `roles`.
- * Omit `roles` to show to everyone (admin + user).
+ * Omit `roles` to show to everyone.
  */
 export const sidebarNav: NavItem[] = [
-  {
-    label: "Home",
-    href: ROUTES.HOME,
-    icon: Home,
-    roles: ["admin", "user"],
-  },
   {
     label: "Dashboard",
     href: ROUTES.DASHBOARD,
     icon: LayoutDashboard,
-    roles: ["admin", "user"],
+    roles: ["admin", "study_manager", "monitor", "site_coordinator", "viewer"],
   },
   {
-    label: "Table",
-    href: ROUTES.DASHBOARD_TABLE,
-    icon: Table2,
-    roles: ["admin", "user"],
+    label: "Studies",
+    href: ROUTES.STUDIES,
+    icon: ClipboardList,
+    roles: ["admin", "study_manager", "monitor", "site_coordinator", "viewer"],
+  },
+  {
+    label: "My CRA Visits",
+    href: ROUTES.MONITORING,
+    icon: Stethoscope,
+    roles: ["admin", "study_manager", "monitor"],
   },
   {
     label: "Admin",
@@ -58,7 +58,7 @@ export const sidebarNavFooter: NavItem[] = [
     label: "Profile",
     href: ROUTES.PROFILE,
     icon: User,
-    roles: ["admin", "user"],
+    roles: ["admin", "study_manager", "monitor", "site_coordinator", "viewer"],
   },
 ];
 

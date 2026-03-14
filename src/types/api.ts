@@ -1,3 +1,5 @@
+import type { AuditLog } from "@/types/database";
+
 /**
  * Standard API response types. All success responses use ApiSuccess<T>;
  * all error responses use ApiErrorPayload (in JSON body) and appropriate HTTP status.
@@ -63,4 +65,12 @@ export interface UserListItem {
   avatar_url: string | null;
   role: string;
   created_at: string;
+}
+
+export interface AuditActivity extends AuditLog {
+  actor_name: string;
+  actor_email: string | null;
+  entity_label: string;
+  entity_name: string | null;
+  message: string;
 }

@@ -5,6 +5,40 @@
 
 ---
 
+## 0. Project State Snapshot (read first)
+
+- Mandatory startup checklist for every new agent:
+  1. Read `completed.md` fully before proposing work.
+  2. Treat `completed.md` as the live execution log for completed sprints/tasks.
+  3. Continue from the next unfinished sprint in `planning/sprints.md` unless the user redirects scope.
+- Current sprint status:
+  - Sprint 0: completed
+  - Sprint 1: completed (Protocol/Design entities, APIs, hooks, tabs)
+  - Sprint 2: completed (Sites Module)
+  - Sprint 3: completed (Subject Enrollment)
+  - Sprint 4: completed (Monitoring Visits)
+  - Sprint 5: completed (Deviations)
+  - Sprint 6: completed (Milestones)
+  - Sprint 7: completed (Portfolio Dashboard)
+  - Sprint 8: completed (Navigation & Polish)
+  - Sprint 9: completed (Document Upload with MinIO/S3 metadata workflows)
+  - Next target: Sprint 10
+- Database migration status:
+  - Applied migration includes protocol entities and `studies.safety_rules/statistical_plan`:
+    `supabase/migrations/20260314000006_protocol_entities.sql`
+  - Applied migration includes site-level permissions + subject assignments:
+    `supabase/migrations/20260314000007_site_permissions_and_assignments.sql`
+- DB change execution rule:
+  - For any new DB/table/column/policy change, prefer applying via **Supabase MCP tools** first.
+  - If MCP is unavailable for a required DB action, ask user approval and run CLI fallback (`npx supabase db push`).
+  - After DB change, verify API endpoints that depend on the new schema.
+- Sprint completion seeding rule:
+  - After completing each sprint, insert minimal dummy data for the new entities (idempotent inserts) so UI screens are demonstrable immediately.
+- Access baseline:
+  - Ensure `ketan.rathod@bacancy.com` remains `admin` in `public.profiles` during local/dev testing.
+
+---
+
 ## 1. Stack
 
 | Layer         | Technology                           |
@@ -76,13 +110,13 @@ COMMANDS.md     # reusable agent commands
 ## 5. Auth & RBAC (what to use)
 
 - **Roles & storage**
-  - Roles: `admin`, `user`, stored on `profiles.role` (see `src/constants/roles.ts` and `docs/database.md`).
+  - Roles: `admin`, `study_manager`, `monitor`, `site_coordinator`, `viewer` stored on `profiles.role` (see `src/constants/roles.ts` and `docs/database.md`).
 - **Route protection**
   | Path pattern | Allowed roles |
   | -------------- | --------------- |
-  | `/dashboard/*` | admin, user |
+  | `/dashboard/*` | all authenticated roles |
   | `/admin/*` | admin |
-  | `/profile/*` | admin, user |
+  | `/profile/*` | all authenticated roles |
 - **Server helpers** (from `@/lib/auth`)
   - `requireAuth()` → ensures a session; returns `{ user, profile }` or `null`.
   - `requireRole(allowedRoles)` → ensures role membership; returns same shape or `null`.
@@ -301,6 +335,7 @@ export function CreateItemForm() {
 
 - **Default workflow:** PLAN (propose and confirm a plan) → IMPLEMENT (follow the plan) → VERIFY (re-check requirements and side effects).
 - When the user provides feature requirements, still follow this loop but use only the MD files and context they give you.
+- **Mandatory API verification:** Next.js runtime is expected at `http://localhost:3000`. For every sprint, test all created/updated API routes for unauthenticated behavior, authenticated success, validation failure, and DB/RLS side effects before handoff.
 
 **Reference files**
 

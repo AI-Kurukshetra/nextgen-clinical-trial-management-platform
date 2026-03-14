@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { requireRole } from "@/lib/auth";
-import { sendSuccess, sendError } from "@/lib/utils/api";
+import { sendError } from "@/lib/utils/api";
 import { ROLES } from "@/constants/roles";
 import type { UserListItem, PaginatedResponse } from "@/types/api";
 
@@ -57,4 +57,3 @@ export async function GET(request: NextRequest) {
     headers: { "Content-Type": "application/json" },
   });
 }
-

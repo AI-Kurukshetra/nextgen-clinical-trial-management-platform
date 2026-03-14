@@ -1,0 +1,55 @@
+version: "3.8"
+
+# NextGen CTMS — Local Development Services
+# Usage:
+#   Start all:    docker compose up -d
+#   Stop all:     docker compose down
+#   MinIO only:   docker compose up -d minio createbuckets
+#   Logs:         docker compose logs -f minio
+
+services:
+  # ─── MinIO — S3-Compatible Object Storage ─────────────────────────────────
+  # Used for: document uploads (protocols, ICFs, monitoring reports, etc.)
+  # Console UI: http://localhost:9001  (login: minioadmin / minioadmin123)
+  # S3 API:     http://localhost:9000
+  minio:
+    image: minio/minio:latest
+    container_name: ctms_minio
+    ports:
+      - "9000:9000"   # S3 API endpoint
+      - "9001:9001"   # MinIO web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin123
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ─── MinIO bucket initializer ─────────────────────────────────────────────
+  # Runs once on startup to create the required bucket and set public read policy
+  createbuckets:
+    image: minio/mc:latest
+    container_name: ctms_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 minioadmin minioadmin123;
+      mc mb --ignore-existing local/ctms-documents;
+      mc mb --ignore-existing local/ctms-signatures;
+      mc anonymous set download local/ctms-documents;
+      echo 'Buckets created successfully';
+      exit 0;
+      "
+    restart: on-failure
+
+volumes:
+  minio_data:
+    name: ctms_minio_data

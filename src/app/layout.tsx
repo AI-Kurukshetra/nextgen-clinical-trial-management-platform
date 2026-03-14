@@ -23,8 +23,13 @@ const ibmPlexMono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js + Supabase Starter",
-  description: "Production-ready Next.js app with Supabase auth and database, role-based access.",
+  title: "TrialFlow CTMS",
+  description:
+    "Clinical Trial Management System for study governance, site operations, monitoring, and compliance.",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+  },
 };
 
 export default function RootLayout({

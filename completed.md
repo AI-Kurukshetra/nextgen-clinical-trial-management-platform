@@ -1,0 +1,199 @@
+# completed
+
+List all the completed tasks here
+
+## Completed Tasks
+- Sprint 0: completed
+- Sprint 1: completed
+  - Added protocol/design schema migration and applied to Supabase (`20260314000006_protocol_entities.sql`)
+  - Implemented protocol APIs: objectives, eligibility criteria, study arms, visit definitions, endpoints, amendments
+  - Implemented protocol hooks (`use-protocol.ts`) and query keys
+  - Added Study Detail tabs: Protocol + Design
+  - Built protocol/design frontend components and pages
+  - Added studies support for `safety_rules` and `statistical_plan`
+  - Updated docs: `docs/api-contracts.md`, `docs/database.md`, planning updates in `planning/sprints.md`
+- Sprint 2: completed
+  - Implemented sites APIs (`GET/POST /api/sites`, `GET/PUT /api/sites/:id`)
+  - Added site schema (`src/types/schemas/site.ts`) and hooks (`src/hooks/use-sites.ts`)
+  - Built sites frontend module:
+    - list page, new page, site detail page
+    - `SitesTable`, `SiteForm`, `SiteStatusBadge`, `SiteStatusStepper`, `EnrollmentGauge`
+  - Updated docs with Sites API contracts
+  - Seeded dummy sites for existing studies (`001` and `002`)
+- Sprint 3: completed
+  - Implemented subjects APIs (`GET/POST /api/subjects`, `GET/PUT /api/subjects/:id`)
+  - Added subject schema (`src/types/schemas/subject.ts`) and hooks (`src/hooks/use-subjects.ts`)
+  - Built subjects frontend module:
+    - study-level subjects page
+    - site-level subject enrollment page
+    - `SubjectsTable`, `EnrollSubjectForm`, `SubjectStatusBadge`, `EnrollmentSummaryCards`, `EnrollmentProgressBar`
+  - Added site-detail shortcut action to enroll a subject at that site
+  - Updated docs with Subjects API contracts
+  - Seeded dummy subjects for existing studies/sites (`001-001`, `001-002`, `002-001`)
+- Sprint 4: completed
+  - Implemented monitoring visit APIs (`GET/POST /api/monitoring-visits`, `GET/PUT /api/monitoring-visits/:id`)
+  - Added monitoring schema (`src/types/schemas/monitoring-visit.ts`) and hooks (`src/hooks/use-monitoring-visits.ts`)
+  - Built monitoring frontend module:
+    - study-level monitoring page
+    - personal monitoring queue page (`/dashboard/monitoring`)
+    - `MonitoringVisitsTable`, `ScheduleVisitForm`, `CompleteVisitForm`, `VisitTypeBadge`
+  - Updated docs with Monitoring Visits API contracts
+  - Seeded dummy monitoring visits (scheduled IMV + completed Remote) across existing sites
+- Sprint 5: completed
+  - Implemented deviations APIs (`GET/POST /api/deviations`, `GET/PUT /api/deviations/:id`)
+  - Added deviation schema (`src/types/schemas/deviation.ts`) and hooks (`src/hooks/use-deviations.ts`)
+  - Built deviations frontend module:
+    - study-level deviations page
+    - `DeviationsTable`, `LogDeviationForm`, `ResolveDeviationForm`, `DeviationSeverityBadge`, `DeviationSummaryCards`
+  - Updated docs with Deviations API contracts
+  - Seeded dummy deviations (major open + critical resolved) for existing studies
+- Sprint 6: completed
+  - Implemented milestones APIs (`GET/POST /api/milestones`, `GET/PUT /api/milestones/:id`)
+  - Added milestone schema (`src/types/schemas/milestone.ts`) and hooks (`src/hooks/use-milestones.ts`)
+  - Built milestones frontend module:
+    - study-level milestones page
+    - `MilestonesTable`, `MilestoneStatusBadge`, `MilestoneVarianceBadge`
+    - add milestone form + quick update form for timeline changes
+  - Updated docs with Milestones API contracts
+  - Seeded dummy milestones (`Interim Analysis Complete`, `Site Activation 50% Achieved`) for existing studies
+- Sprint 7: completed
+  - Implemented dashboard metrics hook (`src/hooks/use-dashboard-metrics.ts`) aggregating studies/sites/subjects/visits/deviations
+  - Added audit trail API (`GET /api/audit-logs`)
+  - Rebuilt dashboard page with:
+    - KPI cards
+    - enrollment progress table
+    - upcoming visits list
+    - open deviations severity summary
+    - recent activity feed
+  - Seeded dummy audit-log records for dashboard recent activity
+- Sprint 8: completed
+  - Added loading skeletons for Studies, Sites, and Subjects list pages
+  - Updated sidebar nav to final Sprint 8 layout (removed legacy Home item)
+  - Improved dynamic breadcrumb handling for `/dashboard/studies/:id/*` routes
+  - Refined dashboard/studies navigation polish and empty/loading states
+- Sprint 9: completed
+  - Implemented documents metadata APIs (`GET/POST /api/documents`, `GET/PUT/DELETE /api/documents/:id`)
+  - Completed MinIO/S3 presign and download APIs (`POST /api/documents/presign`, `GET /api/documents/download/:id`)
+  - Added document schema and hooks (`src/types/schemas/document.ts`, `src/hooks/use-documents.ts`)
+  - Built documents frontend module:
+    - study-level documents page with upload form
+    - documents table with status updates, download, and delete
+    - document status/version badges
+  - Updated docs with Documents API contracts
+  - Seeded dummy document metadata for existing study
+- Access + permissions fix
+  - Investigated `403 Forbidden` on site create
+  - Root cause: `ketan.rathod@bacancy.com` had `viewer` role
+  - Fixed role to `admin` in `public.profiles` and re-verified
+- UX/help improvements
+  - Added CTMS helper text on Studies listing, Study hub, Protocol tab, Design tab, and Sites page
+- Agent onboarding/config update
+  - Added "Project State Snapshot" and startup checklist to `AGENTS.md`
+  - Added explicit rules: prefer Supabase MCP for DB changes, seed dummy data after each sprint, keep Ketan as admin in dev
+- Dashboard activity feed enhancement
+  - Reworked `GET /api/audit-logs` to return enriched `AuditActivity[]` entries with actor metadata and human-readable `message`
+  - Added centralized activity formatter in `src/lib/activity.ts` for consistent sentences (e.g., `Ketan Rathod added study ABC-123`)
+  - Updated dashboard recent activity UI to render readable messages instead of raw `ACTION on table_name`
+  - Updated API docs for enriched audit activity response contract
+- UX + Permission architecture overhaul (post Sprint 9)
+  - Added migration `20260314000007_site_permissions_and_assignments.sql` and applied via Supabase MCP
+  - Added site-level access model with permission bitmasks:
+    - `site_members` table + owner/admin/viewer style role presets
+    - API routes for site member management
+  - Added subject responsibility assignment model:
+    - `subject_assignments` table
+    - APIs for assign/remove subject owners (nurse/doctor/coordinator etc.)
+  - Added auto-generated identifiers:
+    - Study protocol number auto-generated when blank (`ST-{year}-{####}`)
+    - Site number auto-generated when blank (`S-###`)
+  - Replaced key native selects with shadcn dropdown-menu based selectors in Study/Site/Subject forms
+  - Added site governance UI (`SiteMembersPanel`) and subject assignment UI (`SubjectAssignmentsPanel`)
+  - Clarified Monitoring UX as CRA workflow with explanatory text and renamed labels
+- Wave 1 hardening + routing integration
+  - Applied `20260314000008_restore_rls_with_scope_policies.sql` via Supabase MCP and verified RLS enabled on scoped tables
+  - Added role/persona dashboard routing (`/dashboard/admin`, `/dashboard/study-manager`, `/dashboard/site-owner`, `/dashboard/field`, `/dashboard/monitor`)
+  - Introduced shared study access helpers in `src/lib/access-control.ts` and applied scoped checks in studies/documents/monitoring/deviations/milestones APIs
+  - Fixed site create authorization to use study-scoped manage permission (`canManageStudy`) instead of static role gate
+  - Re-asserted `ketan.rathod@bacancy.com` profile role as `admin` in Supabase
+- Sprint 10: completed
+  - Added migration `20260315000001_signatures.sql` and applied via Supabase MCP
+  - Implemented signatures APIs:
+    - `POST /api/signatures` (password re-confirmation + signature creation + status transitions)
+    - `GET /api/signatures/:recordId?table_name=...`
+  - Added signature schema and hook:
+    - `src/types/schemas/signature.ts`
+    - `src/hooks/use-signatures.ts`
+  - Added signature UI components:
+    - `SignDialog`, `SignatureDisplay`, `SignaturesList`
+  - Wired signatures into Documents and Deviations UX:
+    - document approval via signed action
+    - deviation close via signed action
+  - Updated docs: `docs/api-contracts.md`, `docs/database.md`
+- SaaS tenant isolation + patient forms (owner model) completed
+  - Added migration `20260315000002_saas_ownership_and_subject_forms.sql` and applied via Supabase MCP
+  - Study creator is now owner:
+    - `studies.owner_user_id`
+    - `study_team.role` now supports `owner`
+    - `POST /api/studies` available to any authenticated user
+  - Tightened access model:
+    - `admin` only global role
+    - study/site permissions enforced with scoped helper functions
+    - site admin/staff limited to site-scoped operational entities
+  - Added no-code patient form workflow:
+    - tables: `subject_form_templates`, `subject_form_assignments`, `subject_form_submissions`, `subject_portal_links`
+    - APIs for templates, assignments, submissions, and portal links
+    - patient portal assignments endpoint + `/portal` UI
+    - study forms management page at `/dashboard/studies/[id]/forms`
+- RLS recursion + role dashboard fixes
+  - Fixed `study_team` infinite recursion policy issue seen during non-admin study access
+  - Added cleanup migrations:
+    - `20260315000004_fix_study_team_policy_recursion_again.sql`
+    - `20260315000005_cleanup_legacy_study_team_policies.sql`
+    - `20260315000006_break_rls_cycles_and_scope_dashboards.sql`
+  - Cleaned legacy `studies/sites` policies and enforced minimal scoped policy set
+  - Adjusted dashboard routing:
+    - owners -> study manager workspace
+    - site members -> site team workspace
+    - portal-only users -> `/portal`
+  - Relaxed `/api/audit-logs` route auth from role-gated to authenticated scoped access
+- Milestones module overhaul (Trello-style task workflow)
+  - Added migration `20260315000011_milestone_task_board.sql` and applied via Supabase MCP
+  - Enhanced `milestones` model with task assignment fields:
+    - `description`, `site_id`, `assignee_user_id`, `created_by`, `board_order`
+  - Added `can_complete_milestone()` helper + guarded milestone update trigger for assignee completion flow
+  - Reworked milestones APIs:
+    - `GET /api/milestones?mine=true` for assigned task queues
+    - enriched task payload with site/assignee/study metadata + permission flags
+    - `PUT /api/milestones/:id` now supports manager full-edit + assignee completion-only updates
+    - added `DELETE /api/milestones/:id`
+  - Replaced study milestones UI with kanban board + per-task create/edit/delete and complete actions
+  - Added assigned milestone task panels on `/dashboard/site-owner` and `/dashboard/field`
+- Study create RLS permanent fix
+  - Added migration `20260315000008_studies_insert_permanent_fix.sql`
+  - Added DB defaults + trigger to auto-populate `studies.created_by` and `studies.owner_user_id` from `auth.uid()`
+  - Simplified `studies` INSERT policy to allow any authenticated user (`WITH CHECK auth.uid() IS NOT NULL`)
+- Study create definitive fix (RPC)
+  - Added migration `20260315000009_create_study_rpc_bypass_rls.sql`
+  - Added `public.create_study_as_owner(...)` security-definer function
+  - Updated `POST /api/studies` to use RPC for atomic create:
+    - insert study
+    - insert owner into `study_team`
+    - insert default milestones
+- Multi-tenant RLS hardening (sites + scoped cleanup)
+  - Added migration `20260315000010_fix_site_insert_and_multitenant_policy_cleanup.sql` and applied via Supabase MCP
+  - Fixed `sites` INSERT policy to check `can_manage_study(study_id)` (instead of `can_manage_site(id)`)
+  - Split site write policy into explicit insert/update/delete scoped policies
+  - Removed legacy permissive policies on `subjects`, `monitoring_visits`, `deviations`, `milestones`, and `documents` that could bypass tenant scoping
+- Site create final RLS fix (`INSERT ... RETURNING`)
+  - Added migration `20260315000011_fix_sites_select_policy_for_insert_returning.sql` and applied via Supabase MCP
+  - Fixed `sites` SELECT policy to evaluate by `study_id` access/membership (instead of self-resolving through `can_access_site(id)`)
+  - Verified authenticated owner simulation can now execute `insert into sites ... returning ...` without RLS violation
+
+## Deferred Improvements Backlog
+- Re-enable robust RLS policies table-by-table and validate role behavior with test matrix
+- Add automated API integration tests for all completed modules (auth, validation, happy path, side effects)
+- Seed protocol sub-entities (`protocol_objectives`, `protocol_endpoints`, `study_arms`, `eligibility_criteria`, `visit_definitions`, `protocol_amendments`)
+- Improve `/dashboard/monitoring` site label resolution across multi-study queues
+- Strengthen date validation and cross-field business rules in Zod schemas
+- Review/adjust study create permission policy for `viewer` role
+- Add additional UX guardrails and explanatory text for complex status transitions
